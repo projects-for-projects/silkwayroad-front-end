@@ -167,12 +167,13 @@ export default (state = initialState, action) => {
 // action creator - асинх
 export const signUp = (payload,) => {
     return (dispatch) => {
+            
 
-
-            // axios.post(`${link}authe/register/`, payload)
-            axios.post(` http://silk-travel.herokuapp.com/ru/authe/register/`, payload)
+            // axios.post(`${link}auth/users/`, payload)
+            axios
+            .post(`http://127.0.0.1:8000/auth/users/`, payload)
             .then(({data}) => {
-                console.log(JSON.stringify(data))
+                console.log("REGISTR",JSON.stringify(data))
                 dispatch({type: REGISTRATION, payload: data});
                 dispatch({type: SUCCESS});
                 dispatch(getToken(payload));
@@ -182,7 +183,7 @@ export const signUp = (payload,) => {
             .catch((e) => {
                 if (e.message === 'Request failed with status code 400') {
                     console.log("aaa")
-                    dispatch({type: ERROR, payload: 'user with this email already exists'})
+                    dispatch({type: ERROR, payload: e})
                     dispatch(changeLoading());
 
 
@@ -192,7 +193,7 @@ export const signUp = (payload,) => {
 };
 
 export const getToken = (data) => (dispatch) => {
-    axios.post(`${link}authe/token/obtain/`, data)
+    axios.post(`${link}auth/token`, data)
         .then(({data}) => {
             console.log(data);
             dispatch({type: SAVE_TOKEN, payload: data})
@@ -264,7 +265,7 @@ export const deleteVerMessage =()=>({
 
 export const login =(data)=>{
     return(dispatch)=>{
-        axios.post(`http://silk-travel.herokuapp.com/ru/authe/login/`, data)
+        axios.post(`http://127.0.0.1:8000/auth/jwt/create/`, data)
             .then(({data})=>{
                 console.log(data.user.message)
                 dispatch({type:LOGIN, data: data})

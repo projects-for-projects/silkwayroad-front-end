@@ -58,7 +58,7 @@ const Login = () => {
             <button className="login__close-btn" onClick={()=>dispatch(changeIsLogin())}>х</button>
             <input type="text" placeholder="example@gmail.com" className="login__input login__fi" name="email" value={data.email} onChange={(e)=>changeHandler(e)}/>
             <br/>
-            <input type="text" placeholder="● ● ● ● ● ● ● ● ●" className="login__input login__si" name="password" value={data.password} onChange={(e)=>changeHandler(e)}/>
+            <input type="password" placeholder="● ● ● ● ● ● ● ● ●" className="login__input login__si" name="password" value={data.password} onChange={(e)=>changeHandler(e)}/>
             <br/>
 
             <button className="login__remind-btn" onClick={()=>dispatch(changeIsResPass())}>{translate('Забыли пароль?')}</button>
