@@ -1,5 +1,6 @@
 import axios from "axios";
 
+
 const REGISTRATION = 'REGISTRATION';
 const SAVE_TOKEN = 'SAVE_TOKEN';
 const LOGOUT = 'LOGOUT';
@@ -13,8 +14,13 @@ const SUCCESS_PROPERTY = 'SUCCESS_PROPERTY';
 const CHANGE_LOADING = 'CHANGE_LOADING';
 const EMAIL_VERIFICATION = 'EMAIL_VERIFICATION';
 const DELETE_EMAIL_VERIFICATION = 'DELETE_EMAIL_VERIFICATION';
+const ACTIVATION_SUCCESS = 'ACTIVATION_SUCCESS';
+const ACTIVATION_FAIL = 'ACTIVATION_FAIL';
 
-const LOGIN = 'LOGIN';
+const LOGIN_SUCCESS = 'LOGIN_SUCCESS';
+const LOGIN_FAIL = 'LOGIN_FAIL';
+const USER_LOADED_SUCCESS = 'USER_LOADED_SUCCESS';
+const USER_LOADED_FAIL = 'USER_LOADED_FAIL';
 const RESET_PASSWORD = 'RESET_PASSWORD';
 
 const link = process.env.REACT_APP_MAIN_API;
@@ -39,6 +45,7 @@ const initialState = {
     verifyMessage: ''
 
 };
+
 
 
 // reducer
@@ -150,30 +157,68 @@ export default (state = initialState, action) => {
             }
         }
 
-        case LOGIN:{
-            localStorage.setItem('USER', action.data.user.authenticatedUser.email);
-            localStorage.setItem("ACCESS", JSON.stringify(action.data.user.access));
-            localStorage.setItem("REFRESH", JSON.stringify(action.data.user.refresh));
+        case LOGIN_SUCCESS:{
+            
+            localStorage.setItem("ACCESS", JSON.stringify(action.payload.access));
+            localStorage.setItem("REFRESH", JSON.stringify(action.payload.refresh));
             return {
                 ...state,
-                user: action.data.user
             }
         }
+        case USER_LOADED_SUCCESS:{
+            console.log("UserInReducer", action.payload)
+            return {
+                ...state,
+                user: action.payload
+            }
+        }
+        // case PASSWORD_RESET_SUCCESS:
+        // case PASSWORD_RESET_FAIL:
+        // case PASSWORD_RESET_CONFIRM_SUCCESS:
+        // case PASSWORD_RESET_CONFIRM_FAIL:
+        case ACTIVATION_SUCCESS:
+        case ACTIVATION_FAIL:
+            return {
+                ...state
+            }
         default :
             return state
+
     }
 }
+
+export const verify = (uid, token) => async dispatch => {
+    const config = {
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    };
+
+    const body = JSON.stringify({ uid, token });
+
+    try {
+        await axios.post(`${process.env.REACT_APP_API_URL}/auth/users/activation/`, body, config);
+
+        dispatch({
+            type: ACTIVATION_SUCCESS,
+        });
+    } catch (err) {
+        dispatch({
+            type: ACTIVATION_FAIL
+        })
+    }
+};
 
 // action creator - асинх
 export const signUp = (payload,) => {
     return (dispatch) => {
             
 
-            // axios.post(`${link}auth/users/`, payload)
+            // axios.post(`http://127.0.0.1:8000/auth/users/`, payload)
             axios
             .post(`http://127.0.0.1:8000/auth/users/`, payload)
             .then(({data}) => {
-                console.log("REGISTR",JSON.stringify(data))
+                console.log("rDAta",JSON.stringify(data))
                 dispatch({type: REGISTRATION, payload: data});
                 dispatch({type: SUCCESS});
                 dispatch(getToken(payload));
@@ -193,7 +238,7 @@ export const signUp = (payload,) => {
 };
 
 export const getToken = (data) => (dispatch) => {
-    axios.post(`${link}auth/token`, data)
+    axios.post(`http://127.0.0.1:8000/auth/token`, data)
         .then(({data}) => {
             console.log(data);
             dispatch({type: SAVE_TOKEN, payload: data})
@@ -221,7 +266,7 @@ export const deleteMsgForEmpty = () => ({
 export const regConfirmProperty = (data) => (dispatch) => {
     console.log("function 2");
 
-    axios.post(`${link}authe/request-to-register/`, data)
+    axios.post(`http://127.0.0.1:8000/auth/request-to-register/`, data)
         .then(({data}) => {
             if (data === 'Sent') {
                 console.log(data);
@@ -239,52 +284,96 @@ export const changeLoading = () => ({
 
 
 export const confirmEmail = (code) => {
-    let access = localStorage.getItem("ACCESS");
-    access = access.slice(1, (access.length - 1))
-    return (dispatch) => {
-        axios.get(`${link}authe/email-verify/${code}/`, {
-            headers: {'AUTHORIZATION': `Bearer ${access}`}
-        })
-            .then(({data}) => {
-                console.log(data.user.email);
-                if (data.user.email === 'Successfully activated') {
-                    dispatch({type: EMAIL_VERIFICATION, payload: "Ваш Email был успешно подтвержден!"})
-                }
+    // let access = localStorage.getItem("ACCESS");
+    // access = access.slice(1, (access.length - 1))
+    // return (dispatch) => {
+    //     axios.get(`http://127.0.0.1:8000/auth/email-verify/${code}/`, {
+    //         headers: {'AUTHORIZATION': `JWT ${access}`}
+    //     })
+    //         .then(({data}) => {
+    //             console.log(data.user.email);
+    //             if (data.user.email === 'Successfully activated') {
+    //                 dispatch({type: EMAIL_VERIFICATION, payload: "Ваш Email был успешно подтвержден!"})
+    //             }
 
-            })
-            .catch((e) => {
-                console.log(e.message)
+    //         })
+    //         .catch((e) => {
+    //             console.log(e.message)
 
-            })
-    }
+    //         })
+    // }
 };
 
 export const deleteVerMessage =()=>({
     type: DELETE_EMAIL_VERIFICATION
 })
 
-export const login =(data)=>{
-    return(dispatch)=>{
-        axios.post(`http://127.0.0.1:8000/auth/jwt/create/`, data)
-            .then(({data})=>{
-                console.log(data.user.message)
-                dispatch({type:LOGIN, data: data})
-                dispatch(changeLoading());
+export const load_user = () => async dispatch => {
+    console.log("load_user called", localStorage.getItem('ACCESS'))
+    if (localStorage.getItem('ACCESS')) {
+        const config = {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `JWT ${localStorage.getItem('ACCESS').replace(/"/g, '')}`,
+                'Accept': 'application/json'
+            }
+        }; 
 
-            })
-            .catch((e)=>{
-                console.log(e.message)
-                dispatch(changeLoading());
+        console.log("ProfileDataRequest", config)
 
-            })
+        try {
+            const res = await axios.get(`http://127.0.0.1:8000/auth/users/me/`, config);
+
+            const prof = res.data
+            console.log("Profile", prof)
+            dispatch({
+                type: USER_LOADED_SUCCESS,
+                payload: prof
+            });
+        } catch (err) {
+            dispatch({
+                type: USER_LOADED_FAIL
+            });
+        }
+    } else {
+        dispatch({
+            type: USER_LOADED_FAIL
+        });
     }
 };
+
+export const login = (email, password) => (dispatch) => {
+    const config = {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    };
+  
+    const body = JSON.stringify({ email, password });
+  
+    axios
+      .post(`http://127.0.0.1:8000/auth/jwt/create`, body, config)
+      .then((res) => {
+        dispatch({
+          type: LOGIN_SUCCESS,
+          payload: res.data
+        });
+  
+        dispatch(load_user());
+      })
+      .catch((err) => {
+        dispatch({
+          type: LOGIN_FAIL
+        });
+      });
+  };
+  
 
 export const logoutUser =(payload)=>{
     let access = localStorage.getItem("ACCESS");
     access = access.slice(1, (access.length - 1))
     return(dispatch)=>{
-        axios.post(`${link}authe/logout/`, payload, {
+        axios.post(`http://127.0.0.1:8000/auth/logout/`, payload, {
             headers: {'AUTHORIZATION': `Bearer ${access}`}
         })
             .then(({data})=>{
@@ -305,7 +394,7 @@ export const resetPassword =(email)=>{
         "email": email
     };
     return(dispatch)=>{
-        axios.post(`${link}authe/request-reset-password-by-email/`, obj)
+        axios.post(`http://127.0.0.1:8000/auth/request-reset-password-by-email/`, obj)
             .then(({data})=>{
                 console.log(data)
                 // dispatch({type:LOGIN, data: data})

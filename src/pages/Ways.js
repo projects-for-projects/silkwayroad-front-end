@@ -9,6 +9,8 @@ import PrivateRoute from "../accessHelpers/PrivateRoute"
 import Extra from "../components/Extra";
 import Patners from "./Patners";
 import Hotel from "./Hotel";
+import Activate from "./Activate";
+
 
 export default function Ways() {
     return (
@@ -20,6 +22,7 @@ export default function Ways() {
             <Route exact path="/hotels" element={<Hotels/>}/>
             <Route exact path="/patners" element={<Patners/>}/>
             <Route exact path="/hotel" element={<Hotel/>}/>
+            {/* <Route exact path='/activate/:uid/:token' element={<Activate/>}/> */}
 
 
             <Route exact path='/my-area' element={<MyArea/>}/>
@@ -39,7 +42,7 @@ export default function Ways() {
             {/*    <PrivateRoute exact path="/hotels" >*/}
             {/*        <Hotels/>*/}
             {/*    </PrivateRoute>*/}
-            }/>
+            {/* }/> */}
 
 
         </Routes>

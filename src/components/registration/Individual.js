@@ -22,8 +22,8 @@ const Individual = () => {
         first_name: '',
         last_name: '',
         email: '',
-        password: 'vr3243q44t4g4',
-        re_password: 'vr3243q44t4g4'
+        password: '',
+        re_password: ''
         // role: 0
     });
     let message = useSelector(state => state.registration.resultMessage);
@@ -60,9 +60,9 @@ const Individual = () => {
         } else {
             e.preventDefault();
             // data.role = showIndividual ? 1 : 0;
-            dispatch(redirect());
             dispatch(signUp(data))
             console.log("DATA", data)
+            redirect('/');
         }
 
     };
