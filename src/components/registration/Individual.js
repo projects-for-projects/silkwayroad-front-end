@@ -19,9 +19,12 @@ const Individual = () => {
 
 
     const [data, setData] = useState({
+        first_name: '',
+        last_name: '',
         email: '',
         password: '',
-        role: 0
+        re_password: ''
+        // role: 0
     });
     let message = useSelector(state => state.registration.resultMessage);
     let verifyMessage = useSelector(state => state.registration.verifyMessage);
@@ -56,9 +59,10 @@ const Individual = () => {
             console.log("incorrect input")
         } else {
             e.preventDefault();
-            data.role = showIndividual ? 1 : 0;
-            dispatch(changeLoading());
+            // data.role = showIndividual ? 1 : 0;
             dispatch(signUp(data))
+            console.log("DATA", data)
+            redirect('/');
         }
 
     };
@@ -99,11 +103,19 @@ const Individual = () => {
 
 
                 <div className="signup__inputs-div">
-                    <input required type="email" placeholder="email" className="signup__input" value={data.email}
+                    <input required type="text" placeholder="First Name" className="signup__input" value={data.first_name}
+                           name="first_name"
+                           onChange={changeHandler}/>
+                    <input required type="text" placeholder="Last Name" className="signup__input" value={data.last_name}
+                           name="last_name"
+                           onChange={changeHandler}/>
+                    <input required type="email" placeholder="Email" className="signup__input" value={data.email}
                            name="email"
                            onChange={changeHandler}/>
-                    <input required type="text" placeholder="password" className="signup__input" value={data.password}
+                    <input required type="password" placeholder="Password" className="signup__input" value={data.password}
                            name="password" onChange={changeHandler}/>
+                    <input required type="password" placeholder="Confirm Password" className="signup__input" value={data.re_password}
+                    name="re_password" onChange={changeHandler}/>
                 </div>
 
                 <div className="signup__btn-div">

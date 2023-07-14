@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {Link, useNavigate} from "react-router-dom";
+import { useNavigate} from "react-router-dom";
 import {useDispatch, useSelector} from "react-redux";
 import RemindPass from "./RemindPass";
 import {changeIsLogin, changeIsResPass, setLoginToFalse, setMenuStatus} from "../redux/reducer/visReducer";
@@ -8,7 +8,6 @@ import translate from "../i18n/translate";
 
 const Login = () => {
     const dispatch = useDispatch();
-
 
     const showLogin = useSelector(state => state.store.showLogin);
     const showResPass = useSelector(state => state.store.showResPass);
@@ -35,10 +34,11 @@ const Login = () => {
     const loginUser =()=>{
         console.log("LETS MAKE A LOGIN!");
         console.log("WE WILL SEND" + JSON.stringify(data));
-        dispatch(changeLoading());
-        dispatch(login(data));
-        dispatch(changeIsLogin());
+        // dispatch(changeLoading());
+        dispatch(login(data.email, data.password));
+        // dispatch(changeIsLogin());
         dispatch(setMenuStatus(false));
+        navigate('/my-area');
 
     };
 
@@ -58,7 +58,7 @@ const Login = () => {
             <button className="login__close-btn" onClick={()=>dispatch(changeIsLogin())}>х</button>
             <input type="text" placeholder="example@gmail.com" className="login__input login__fi" name="email" value={data.email} onChange={(e)=>changeHandler(e)}/>
             <br/>
-            <input type="text" placeholder="● ● ● ● ● ● ● ● ●" className="login__input login__si" name="password" value={data.password} onChange={(e)=>changeHandler(e)}/>
+            <input type="password" placeholder="● ● ● ● ● ● ● ● ●" className="login__input login__si" name="password" value={data.password} onChange={(e)=>changeHandler(e)}/>
             <br/>
 
             <button className="login__remind-btn" onClick={()=>dispatch(changeIsResPass())}>{translate('Забыли пароль?')}</button>

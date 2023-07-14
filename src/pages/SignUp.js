@@ -1,4 +1,5 @@
 import React, {useEffect, useState} from 'react';
+import axios from 'axios';
 import {useDispatch, useSelector} from "react-redux";
 import registration, {clearData, deleteVerMessage, sendMsgForEmpty, signUp} from "../redux/reducer/authReducer";
 import {Link, useNavigate} from "react-router-dom";
@@ -10,6 +11,23 @@ import translate from "../i18n/translate";
 import {setLocale} from "../redux/reducer/lanReducer";
 import {LOCALES} from "../i18n";
 
+
+// const signUp = async (firstname, lastname, email, password) => {
+//     try {
+//       const response = await axios.post('http://127.0.0.1:8000/users/', {
+//         // Request payload or data
+//         email: email,
+//         first_name: firstname,
+//         last_name: lastname,
+//         password: password
+//       });
+//       // Handle the response
+//       console.log(response.data); // Assuming the server returns JSON data
+//     } catch (error) {
+//       // Handle error
+//       console.error(error);
+//     }
+//   };
 
 const SignUp = () => {
     const isMenuShown = useSelector(state=>state.store.isMenuShown);
@@ -42,7 +60,6 @@ const SignUp = () => {
             <h2 className="signup__title">{translate('Выберите тип регистрации :')}</h2>
 
             <div className="signup__choice">
-                {/*<p className="signup__choice-p">Choose registration type:</p>*/}
 
                 <div className="signup__labels">
 
@@ -58,39 +75,17 @@ const SignUp = () => {
                         <span className="signup__span">{translate('Юридическое лицо')}</span>
                     </label>
 
-                    {/*<label className="signup__label">*/}
-                    {/*    <input type="radio" name="radio" onClick={()=>dispatch(showProperty())}/>*/}
-                    {/*    <span className="signup__span">Зарегистрировать свой объект</span>*/}
-                    {/*</label>*/}
                 </div>
             </div>
             <hr className="signup__devide-line"/>
 
-            {/*<hr style={{marginBottom: '20px'}}/>*/}
-
-
             <Individual/>
             <Entity/>
-            {/*<Property/>*/}
-
-
-
-
-
-
-            {/*<div className="signup__message-div">*/}
-            {/*    <p className="signup__message">User was susseccfullu registered :)</p>*/}
-            {/*    <button className="signup__back-home-btn" >back home*/}
-
-            {/*    </button>*/}
-            {/*</div>*/}
-
-
 
             <div className="signup__entity-form" style={{display: 'none'}}>
                 <input type="text" placeholder="email" className="signup__input"/>
                 <input type="text" placeholder="password" className="signup__input"/>
-                <button className="signup__btn">Sign Up</button>
+                <button className="signup__btn" onClick={signUp()}>Sign Up</button>
             </div>
 
 
